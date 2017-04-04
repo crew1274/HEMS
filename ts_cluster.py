@@ -107,4 +107,4 @@ class ts_cluster(object):
 				LB_sum=LB_sum+(i-lower_bound)**2
 	    
 		return np.sqrt(LB_sum)
-	
+		
