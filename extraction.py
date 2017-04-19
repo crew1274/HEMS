@@ -5,6 +5,24 @@ import numpy as np
 from scipy.spatial.distance import euclidean
 from fastdtw import fastdtw
 from collections import Counter
+from random import randint ,randrange
+
+def valid(target_time,gap):
+    #抓取時間範圍
+    range_x=target_time-pd.to_timedelta(15, unit='m')
+    range_y=range_x+pd.to_timedelta(30, unit='m')#往後抓15分鐘
+    loc_pre=df.loc[range_x:range_y].Global_active_power
+    #抓取欲比對的時間範圍
+    range_x=target_time-pd.to_timedelta( gap , unit='d')-pd.to_timedelta(15, unit='m')
+    range_y=range_x+pd.to_timedelta(30, unit='m')#往後抓15分鐘
+    loc_before=df.loc[range_x:range_y].Global_active_power
+    #計算移動平均
+    loc_pre_mean = loc_pre.rolling(window=15).mean()
+    loc_before_mean = loc_before.rolling(window=15).mean()
+    distance, path = fastdtw(loc_pre_mean[15:].values, loc_before_mean[15:].values, dist=euclidean)
+    print('移動平均後的DWT:%s' %(distance))
+    return distance
+
 
 def valid_read(target_time, gap):
     range_y=target_time
@@ -72,23 +90,32 @@ def main( target_time , gap ):
 if __name__ == "__main__":
     df=pd.read_csv('D:\Dropbox\paper/dataset/new_record.csv')#讀取資料
     df.index = pd.to_datetime(df['Datetime']) #轉換index，因為從csv讀取無index
+    '''
+    #輸入時間
     date=format(sys.argv[1])
     time=format(sys.argv[2])
-    #gap = 90 #1.5個小時
     target_time=pd.to_datetime(date+' '+time)#轉換時間標籤
-    stamp_tmp = []
-    distance = []
-    for gap in range(30,105,15):
-        #30、45、60、75、90
-        min_distance , stamp = main(target_time, gap)
-        stamp_tmp.append(stamp)
-        distance.append(min_distance)
-    dictionary=dict(zip(stamp_tmp, distance))
-    #fine the most common element in list
-    stamp=Counter(stamp_tmp).most_common(1)
-    print('最接近的時間: %s 天前' %(stamp[0][0]))
-    #是否需要計算平均的距離驗算正確度?
-    #print('平均距離: %s ' %(stamp))
+    '''
+    #隨機時間
+    for i in range(1,5,1):
+        target_time=pd.to_datetime('%s/%s/%s %s:%s'%(randint(2007,2009),randint(1,12),randint(1,28),randint(0,24),randrange(0,60,15)))
+        stamp_tmp = []
+        distance = []
+        for gap in range(30,105,15):
+            #30、45、60、75、90
+            min_distance , stamp = main(target_time, gap)
+            stamp_tmp.append(stamp)
+            distance.append(min_distance)
+        dictionary=dict(zip(stamp_tmp, distance))
+        #fine the most common element in list
+        stamp=Counter(stamp_tmp).most_common(1)
+        print('%s 最接近的時間: %s 天前' %(target_time,stamp[0][0]))
+        '''
+        #是否需要計算平均的距離驗算正確度?
+        #print('平均距離: %s ' %(stamp))
+        '''
+        distance_tmp = valid(target_time,stamp[0][0])
+
     #min_target_time=target_time-pd.to_timedelta(stamp , unit='d')
     #valid_read(target_time,gap)
     #valid_read(min_target_time,gap)
