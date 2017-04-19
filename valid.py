@@ -37,7 +37,6 @@ loc_before=df.loc[range_x:range_y].Global_active_power
 loc_pre_mean = loc_pre.rolling(window=15).mean()
 loc_before_mean = loc_before.rolling(window=15).mean() 
 
-
 print(loc_pre_mean[15:])
 print(loc_pre_mean[15:].values)
 print(loc_before_mean[15:])
@@ -49,7 +48,8 @@ print(distance)
 
 #計算移動平均的DWT距離
 distance, path = fastdtw(loc_pre_mean[15:].values, loc_before_mean[15:].values, dist=euclidean)
-print(distance)
+print('移動平均後的DWT:%s' %(distance))
+
 read(target_time)
 min_target_time=target_time-pd.to_timedelta(gap , unit='d')
 read(min_target_time)
