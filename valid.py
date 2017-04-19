@@ -36,12 +36,12 @@ loc_before=df.loc[range_x:range_y].Global_active_power
 #計算移動平均
 loc_pre_mean = loc_pre.rolling(window=15).mean()
 loc_before_mean = loc_before.rolling(window=15).mean() 
-
+'''
 print(loc_pre_mean[15:])
 print(loc_pre_mean[15:].values)
 print(loc_before_mean[15:])
 print(loc_before_mean[15:].values)
-
+'''
 #計算DWT距離
 distance, path = fastdtw(loc_pre.values, loc_before.values, dist=euclidean)
 print(distance)

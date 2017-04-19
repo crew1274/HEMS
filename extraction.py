@@ -87,10 +87,9 @@ if __name__ == "__main__":
     #fine the most common element in list
     stamp=Counter(stamp_tmp).most_common(1)
     print('最接近的時間: %s 天前' %(stamp[0][0]))
-    '''
-    是否需要計算平均的距離驗算正確度?
-    print('平均距離: %s ' %(stamp))
-    '''
-    min_target_time=target_time-pd.to_timedelta(stamp , unit='d')
-    valid_read(target_time,gap)
-    valid_read(min_target_time,gap)
+    #是否需要計算平均的距離驗算正確度?
+    #print('平均距離: %s ' %(stamp))
+    #min_target_time=target_time-pd.to_timedelta(stamp , unit='d')
+    #valid_read(target_time,gap)
+    #valid_read(min_target_time,gap)
+    
