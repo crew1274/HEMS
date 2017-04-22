@@ -88,7 +88,7 @@ def main( target_time , gap ):
     return min_distance , stamp
 
 if __name__ == "__main__":
-    df=pd.read_csv('D:\Dropbox\paper/dataset/new_record.csv')#讀取資料
+    df=pd.read_csv('/home/crew1274/Dropbox/paper/dataset/new_record.csv')#讀取資料
     df.index = pd.to_datetime(df['Datetime']) #轉換index，因為從csv讀取無index
     '''
     #輸入時間
@@ -98,12 +98,12 @@ if __name__ == "__main__":
     '''
     record = []
     threshold = 15
+    count = 0
     #隨機時間
-    for i in range(0,100,1):
+    for i in range(0,10,1):
         target_time=pd.to_datetime('%s/%s/%s %s:%s'%(randint(2007,2009),randint(1,12),randint(1,28),randint(0,23),randrange(0,59,15)))
         stamp_tmp = []
         distance = []
-        count = 0
         for gap in range(30,105,15):
             #30、45、60、75、90
             min_distance , stamp = main(target_time, gap)
@@ -126,12 +126,9 @@ if __name__ == "__main__":
         record.append(tmp)
     record = pd.DataFrame(record,columns=['datetimes','stamp','distance','alert'])
     print(record)
-    record.to_csv('record.csv')
+    record.to_csv('record.csv',mode='a',header=False)
     print(count)
-
-
-
-
+    
     #min_target_time=target_time-pd.to_timedelta(stamp , unit='d')
     #valid_read(target_time,gap)
     #valid_read(min_target_time,gap)
