@@ -96,11 +96,14 @@ if __name__ == "__main__":
     time=format(sys.argv[2])
     target_time=pd.to_datetime(date+' '+time)#轉換時間標籤
     '''
+    record = []
+    threshold = 15
     #隨機時間
-    for i in range(1,5,1):
-        target_time=pd.to_datetime('%s/%s/%s %s:%s'%(randint(2007,2009),randint(1,12),randint(1,28),randint(0,24),randrange(0,60,15)))
+    for i in range(0,100,1):
+        target_time=pd.to_datetime('%s/%s/%s %s:%s'%(randint(2007,2009),randint(1,12),randint(1,28),randint(0,23),randrange(0,59,15)))
         stamp_tmp = []
         distance = []
+        count = 0
         for gap in range(30,105,15):
             #30、45、60、75、90
             min_distance , stamp = main(target_time, gap)
@@ -109,12 +112,25 @@ if __name__ == "__main__":
         dictionary=dict(zip(stamp_tmp, distance))
         #fine the most common element in list
         stamp=Counter(stamp_tmp).most_common(1)
-        print('%s 最接近的時間: %s 天前' %(target_time,stamp[0][0]))
+        print('猜測與 %s 時用電行為最相似的時間: %s 天前' %(target_time,stamp[0][0]))
         '''
         #是否需要計算平均的距離驗算正確度?
         #print('平均距離: %s ' %(stamp))
         '''
         distance_tmp = valid(target_time,stamp[0][0])
+        if(distance_tmp > 15 ):
+            tmp=[target_time,stamp[0][0],distance_tmp,True]
+            count= count +1
+        else:
+            tmp=[target_time,stamp[0][0],distance_tmp,False]
+        record.append(tmp)
+    record = pd.DataFrame(record,columns=['datetimes','stamp','distance','alert'])
+    print(record)
+    record.to_csv('record.csv')
+    print(count)
+
+
+
 
     #min_target_time=target_time-pd.to_timedelta(stamp , unit='d')
     #valid_read(target_time,gap)
