@@ -20,7 +20,7 @@ def valid(target_time,gap):
     loc_pre_mean = loc_pre.rolling(window=15).mean()
     loc_before_mean = loc_before.rolling(window=15).mean()
     distance, path = fastdtw(loc_pre_mean[15:].values, loc_before_mean[15:].values, dist=euclidean)
-    print('移動平均後的DWT:%s' %(distance))
+    print('驗證移動平均後的DWT:%s' %(distance))
     return distance
 
 
@@ -103,22 +103,25 @@ if __name__ == "__main__":
     for i in range(0,5,1):
         target_time=pd.to_datetime('%s/%s/%s %s:%s'%(randint(2007,2009),randint(1,12),randint(1,28),randint(0,23),randrange(0,59,15)))
         stamp_tmp = []
-        distance = []
+        dist_tmp = []
         for gap in range(30,105,15):
             #30、45、60、75、90
             min_distance , stamp = main(target_time, gap)
+            dist_tmp.append(min_distance)
             stamp_tmp.append(stamp)
-            distance.append(min_distance)
-        dictionary=dict(zip(stamp_tmp, distance))
+        print(dist_tmp)
+        print(stamp_tmp)
         #fine the most common element in list
         stamp=Counter(stamp_tmp).most_common(1)
         print('猜測與 %s 時用電行為最相似的時間: %s 天前' %(target_time,stamp[0][0]))
-        '''
-        #是否需要計算平均的距離驗算正確度?
-        #print('平均距離: %s ' %(stamp))
-        '''
+        threshold=0
+        for k in range(5):
+            if stamp_tmp[k] == stamp[0][0]:
+                if threshold < dist_tmp[k]:
+                    threshold = dist_tmp[k]
+        print('預估相似值為:%s'%(threshold))
         distance_tmp = valid(target_time,stamp[0][0])
-        if(distance_tmp > 15 ):
+        if(distance_tmp > threshold ):
             tmp=[target_time,stamp[0][0],distance_tmp,True]
             count= count +1
         else:
@@ -126,9 +129,8 @@ if __name__ == "__main__":
         record.append(tmp)
     record = pd.DataFrame(record,columns=['datetimes','stamp','distance','alert'])
     print(record)
-    record.to_csv('record_2.csv',mode='a',header=False)
-    print(count)
-    
+    print('錯誤警報:%s次'%(count))
+    record.to_csv('record.csv',mode='a',header=False)    
     #min_target_time=target_time-pd.to_timedelta(stamp , unit='d')
     #valid_read(target_time,gap)
     #valid_read(min_target_time,gap)

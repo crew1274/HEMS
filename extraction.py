@@ -89,6 +89,7 @@ def main( target_time , gap ):
 
 if __name__ == "__main__":
     df=pd.read_csv('D:\Dropbox\paper/dataset/new_record_fake.csv')#讀取資料
+    #df=pd.read_csv('D:\Dropbox\paper/dataset/new_record.csv')
     df.index = pd.to_datetime(df['Datetime']) #轉換index，因為從csv讀取無index
     #輸入時間
     date=format(sys.argv[1])
@@ -105,20 +106,17 @@ if __name__ == "__main__":
         min_distance , stamp = main(target_time, gap)
         stamp_tmp.append(stamp)
         distance.append(min_distance)
-    dictionary=dict(zip(stamp_tmp, distance))
-        #fine the most common element in list
+    #fine the most common element in list
     stamp=Counter(stamp_tmp).most_common(1)
     print('猜測與 %s 時用電行為最相似的時間: %s 天前' %(target_time,stamp[0][0]))
     distance_tmp = valid(target_time,stamp[0][0])
     if(distance_tmp > 15 ):
         tmp=[target_time,stamp[0][0],distance_tmp,True]
-        count= count +1
     else:
         tmp=[target_time,stamp[0][0],distance_tmp,False]
     record.append(tmp)
     print(record)
-    print(count)
-    
+
     #min_target_time=target_time-pd.to_timedelta(stamp , unit='d')
     #valid_read(target_time,gap)
     #valid_read(min_target_time,gap)
