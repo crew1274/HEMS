@@ -96,6 +96,4 @@ ENV/
 # mkdocs documentation
 /site
 
-/.vscode
 /.idea
-/record

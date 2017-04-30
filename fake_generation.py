@@ -7,15 +7,14 @@ df=pd.read_csv('D:\Dropbox\paper/dataset/new_record_fake.csv') #讀取資料
 #df=pd.read_csv('D:\Dropbox\paper/dataset/new_record.csv') #讀取資料
 df.index = pd.to_datetime(df['Datetime']) #轉換index，因為從csv讀取無index
 
-range_x=pd.to_datetime('2007/9/2 8:00')#轉換時間標籤
-range_y=pd.to_datetime('2007/9/2 10:00')#轉換時間標籤
+range_x=pd.to_datetime('2007/6/3 15:00')#轉換時間標籤
+range_y=pd.to_datetime('2007/6/3 18:00')#轉換時間標籤
 print(df.Global_active_power.loc[range_x:range_y])
-df.loc[range_x:range_y,'Global_active_power'] = 2.8
-print(df.Global_active_power.loc['2007/9/2'])
-loc_pre=df.Global_active_power.loc['2007/9/2']
+df.loc[range_x:range_y,'Global_active_power'] = 3
+loc_pre=df.Global_active_power.loc['2007/6/3']
 loc_pre_mean = loc_pre.rolling(window=15).mean()
 loc_pre_mean.plot()
-plot.title('2007/9/2 fake')
+plot.title('2007/6/3 fake')
 plot.show()
 '''
 #抓取時間範圍
