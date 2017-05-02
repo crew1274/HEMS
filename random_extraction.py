@@ -7,6 +7,7 @@ from fastdtw import fastdtw
 from collections import Counter
 from random import randint ,randrange
 
+mean = 15
 def valid(target_time,gap):
     #抓取時間範圍
     range_x=target_time-pd.to_timedelta(15, unit='m')

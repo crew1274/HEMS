@@ -6,30 +6,31 @@ from scipy.spatial.distance import euclidean
 from fastdtw import fastdtw
 from collections import Counter
 from random import randint ,randrange
-
+mean = 5 #roll mean window size
+time_gap = 15 #比對時間長度
+threshold = 15 #門檻值
 def valid(target_time,gap):
     #抓取時間範圍
-    range_x=target_time-pd.to_timedelta(15, unit='m')
-    range_y=range_x+pd.to_timedelta(30, unit='m')#往後抓15分鐘
+    range_x=target_time-pd.to_timedelta(time_gap, unit='m')
+    range_y=range_x+pd.to_timedelta(time_gap*2, unit='m')#往後抓15分鐘
     loc_pre=df.loc[range_x:range_y].Global_active_power
     #抓取欲比對的時間範圍
-    range_x=target_time-pd.to_timedelta( gap , unit='d')-pd.to_timedelta(15, unit='m')
-    range_y=range_x+pd.to_timedelta(30, unit='m')#往後抓15分鐘
+    range_x=target_time-pd.to_timedelta( gap , unit='d')-pd.to_timedelta(time_gap, unit='m')
+    range_y=range_x+pd.to_timedelta(time_gap*2, unit='m')#往後抓15分鐘
     loc_before=df.loc[range_x:range_y].Global_active_power
     #計算移動平均
-    loc_pre_mean = loc_pre.rolling(window=15).mean()
-    loc_before_mean = loc_before.rolling(window=15).mean()
-    distance, path = fastdtw(loc_pre_mean[15:].values, loc_before_mean[15:].values, dist=euclidean)
+    loc_pre_mean = loc_pre.rolling(window=mean).mean()
+    loc_before_mean = loc_before.rolling(window=mean).mean()
+    distance, path = fastdtw(loc_pre_mean[time_gap:].values, loc_before_mean[mean:].values, dist=euclidean)
     print('移動平均後的DWT:%s' %(distance))
     return distance
-
 
 def valid_read(target_time, gap):
     range_y=target_time
     range_x=range_y-pd.to_timedelta(gap, unit='m')   
     loc_pre=df.loc[range_x:range_y].Global_active_power 
-    loc_pre_mean= loc_pre.rolling(window=15).mean()
-    loc_pre_mean[15:].plot()
+    loc_pre_mean= loc_pre.rolling(window=mean).mean()
+    loc_pre_mean[mean:].plot()
     plot.title(target_time)
     plot.show()
 
@@ -38,7 +39,7 @@ def main( target_time , gap ):
     range_y=target_time
     range_x=range_y-pd.to_timedelta(gap, unit='m')    #往前抓取1小時
     loc_pre=df.loc[range_x:range_y].Global_active_power #撈資料
-    loc_pre_mean= loc_pre.rolling(window=15).mean()    #計算移動平均
+    loc_pre_mean= loc_pre.rolling(window=mean).mean()    #計算移動平均
     #print(loc_pre_mean[15:].values)
     #print('===============================')
     min_distance = None
@@ -51,10 +52,10 @@ def main( target_time , gap ):
         range_time=range_x,range_y
         loc_before = df.loc[range_time[0]:range_time[1]].Global_active_power #抓資料
         #計算移動平均
-        loc_before_mean= loc_before.rolling(window=15).mean()
+        loc_before_mean= loc_before.rolling(window=mean).mean()
         #print(loc_before_mean[15:].values)
         #計算移動平均的DWT距離
-        distance, path = fastdtw(loc_pre_mean[15:].values, loc_before_mean[15:].values, dist=euclidean)
+        distance, path = fastdtw(loc_pre_mean[mean:].values, loc_before_mean[mean:].values, dist=euclidean)
         #print(distance)
         #print('===============================')
         #尋找最小的距離並記錄timestamp        
@@ -72,10 +73,10 @@ def main( target_time , gap ):
         range_time=range_x,range_y
         loc_before = df.loc[range_time[0]:range_time[1]].Global_active_power #抓資料
         #計算移動平均
-        loc_before_mean= loc_before.rolling(window=15).mean()
+        loc_before_mean= loc_before.rolling(window=mean).mean()
         #print(loc_before_mean[15:].values)
         #計算移動平均的DWT距離
-        distance, path = fastdtw(loc_pre_mean[15:].values, loc_before_mean[15:].values, dist=euclidean)
+        distance, path = fastdtw(loc_pre_mean[mean:].values, loc_before_mean[mean:].values, dist=euclidean)
         #print(distance)
         #print('===============================')
         if min_distance >  distance:
@@ -96,8 +97,6 @@ if __name__ == "__main__":
     time=format(sys.argv[2])
     target_time=pd.to_datetime(date+' '+time)#轉換時間標籤
     record = []
-    threshold = 15
-    count = 0
     #隨機時間
     stamp_tmp = []
     distance = []
@@ -110,7 +109,7 @@ if __name__ == "__main__":
     stamp=Counter(stamp_tmp).most_common(1)
     print('猜測與 %s 時用電行為最相似的時間: %s 天前' %(target_time,stamp[0][0]))
     distance_tmp = valid(target_time,stamp[0][0])
-    if(distance_tmp > 15 ):
+    if(distance_tmp > threshold ):
         tmp=[target_time,stamp[0][0],distance_tmp,True]
     else:
         tmp=[target_time,stamp[0][0],distance_tmp,False]
