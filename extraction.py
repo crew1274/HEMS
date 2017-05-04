@@ -6,7 +6,8 @@ from scipy.spatial.distance import euclidean
 from fastdtw import fastdtw
 from collections import Counter
 from random import randint ,randrange
-mean = 5 #roll mean window size
+
+mean = 15 #roll mean window size
 time_gap = 15 #比對時間長度
 threshold = 15 #門檻值
 def valid(target_time,gap):
@@ -24,14 +25,10 @@ def valid(target_time,gap):
     distance, path = fastdtw(loc_pre_mean[time_gap:].values, loc_before_mean[mean:].values, dist=euclidean)
     print('移動平均後的DWT:%s' %(distance))
     return distance
-
+    
 def valid_read(target_time, gap):
     range_y=target_time
     range_x=range_y-pd.to_timedelta(gap, unit='m')   
-    loc_pre=df.loc[range_x:range_y].Global_active_power 
-    loc_pre_mean= loc_pre.rolling(window=mean).mean()
-    loc_pre_mean[mean:].plot()
-    plot.title(target_time)
     plot.show()
 
 def main( target_time , gap ):
@@ -108,6 +105,7 @@ if __name__ == "__main__":
     #fine the most common element in list
     stamp=Counter(stamp_tmp).most_common(1)
     print('猜測與 %s 時用電行為最相似的時間: %s 天前' %(target_time,stamp[0][0]))
+    valid(target_time,stamp[0][0])
     distance_tmp = valid(target_time,stamp[0][0])
     if(distance_tmp > threshold ):
         tmp=[target_time,stamp[0][0],distance_tmp,True]
@@ -115,7 +113,6 @@ if __name__ == "__main__":
         tmp=[target_time,stamp[0][0],distance_tmp,False]
     record.append(tmp)
     print(record)
-
     #min_target_time=target_time-pd.to_timedelta(stamp , unit='d')
     #valid_read(target_time,gap)
     #valid_read(min_target_time,gap)
