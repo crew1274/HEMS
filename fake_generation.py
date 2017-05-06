@@ -2,19 +2,25 @@ import sys
 import pandas as pd
 import matplotlib.pyplot as plot
 import numpy as np
-
-df=pd.read_csv('D:\Dropbox\paper/dataset/new_record_fake.csv') #讀取資料
-#df=pd.read_csv('D:\Dropbox\paper/dataset/new_record.csv') #讀取資料
+import random
+date = "2008/5/16 9:00"
+gap = 3
+mean = 15
+df = pd.read_csv('D:\Dropbox\paper/dataset/new_record_fake.csv') #讀取資料
 df.index = pd.to_datetime(df['Datetime']) #轉換index，因為從csv讀取無index
-
-range_x=pd.to_datetime('2008/5/16 9:00')#轉換時間標籤
-range_y=pd.to_datetime('2008/5/16 13:00')#轉換時間標籤
+#轉換時間標籤
+range_x = pd.to_datetime(date)
+range_y = range_x+pd.to_timedelta(gap, unit='h')
+loc = df.loc[range_x:range_y]
+for  index,i in loc.iterrows():
+    #print(i['Global_active_power'])
+    df.loc[index,'Global_active_power'] = random.uniform(3,3.5)
+#顯示當天用電圖
 print(df.Global_active_power.loc[range_x:range_y])
-df.loc[range_x:range_y,'Global_active_power'] = 3
-loc_pre=df.Global_active_power.loc['2008/5/16']
-loc_pre_mean = loc_pre.rolling(window=15).mean()
+loc_pre = df.Global_active_power.loc[date.split()[0]]
+loc_pre_mean = loc_pre.rolling(window=mean).mean()
 loc_pre_mean.plot()
-plot.title('2008/5/16 fake')
+plot.title('%s fake'%(date))
 plot.show()
 '''
 #抓取時間範圍
