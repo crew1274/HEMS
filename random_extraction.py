@@ -1,13 +1,21 @@
 import sys
-import pandas as pd
+from collections import Counter
+from random import randint, randrange
+
 import matplotlib.pyplot as plot
 import numpy as np
-from scipy.spatial.distance import euclidean
+import pandas as pd
 from fastdtw import fastdtw
-from collections import Counter
-from random import randint ,randrange
+from scipy.spatial.distance import euclidean
 
-mean = 15
+mean = 15 #roll mean window size
+#window size 越長，偵測延遲越長
+
+weight = 1
+time_gap = 15 #比對時間長度
+threshold = time_gap * weight #門檻值
+#比對時間越長，門檻值相對越高
+
 def valid(target_time,gap):
     #抓取時間範圍
     range_x=target_time-pd.to_timedelta(15, unit='m')
@@ -135,4 +143,3 @@ if __name__ == "__main__":
     #min_target_time=target_time-pd.to_timedelta(stamp , unit='d')
     #valid_read(target_time,gap)
     #valid_read(min_target_time,gap)
-    

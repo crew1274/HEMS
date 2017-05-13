@@ -14,7 +14,7 @@ range_y = range_x+pd.to_timedelta(gap, unit='h')
 loc = df.loc[range_x:range_y]
 for  index,i in loc.iterrows():
     #print(i['Global_active_power'])
-    df.loc[index,'Global_active_power'] = random.uniform(3,3.5)
+    df.loc[index,'Global_active_power'] = random.uniform(3,3.25)
 #顯示當天用電圖
 print(df.Global_active_power.loc[range_x:range_y])
 loc_pre = df.Global_active_power.loc[date.split()[0]]

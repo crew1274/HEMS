@@ -1,0 +1,5 @@
+roll mean window = 15
+time gap = 15
+weight = 1
+FPR(false positive rate) = 0.13
+TPR(true positive rate) = 0.9
