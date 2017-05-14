@@ -1,6 +1,6 @@
 import sys
 from collections import Counter
-from random import randint, randrange
+from random import randint, randrange , uniform
 
 import matplotlib.pyplot as plot
 import numpy as np
@@ -9,8 +9,9 @@ from fastdtw import fastdtw
 from scipy.spatial.distance import euclidean
 
 date = "2008/10/20 8:00" 
-interval = 3 #單位小時
+interval = 4 #單位小時，生成假資料的時間長度
 run_gap = 15 #每隔幾分鐘檢查
+fake_range  = 4 , 4.25  #生成假資料的範圍
 mean = 15  # roll mean window size，window size 越長，偵測延遲越長
 weight = 1  #權重
 time_gap = 15 #比對時間長度
@@ -22,8 +23,8 @@ def valid(target_time, gap):
     range_y = range_x + pd.to_timedelta(time_gap * 2, unit='m')
     loc_pre = df.loc[range_x:range_y].Global_active_power
     # 抓取欲比對的時間範圍
-    range_x = target_time - pd.to_timedelta(gap, unit='d') - pd.to_timedelta(time_gap, unit='m')
-    range_y = range_x + pd.to_timedelta(time_gap * 2, unit='m')  
+    range_x = target_time-pd.to_timedelta(gap, unit='d') - pd.to_timedelta(time_gap, unit='m')
+    range_y = range_x + pd.to_timedelta(time_gap * 2, unit='m')
     loc_before = df.loc[range_x:range_y].Global_active_power
     # 計算移動平均
     loc_pre_mean = loc_pre.rolling(window=mean).mean()
@@ -32,12 +33,6 @@ def valid(target_time, gap):
         loc_pre_mean[time_gap:].values, loc_before_mean[mean:].values, dist=euclidean)
     print('移動平均後的DWT:%s' % (distance))
     return distance
-
-
-def valid_read(target_time, gap):
-    range_y = target_time
-    range_x = range_y - pd.to_timedelta(gap, unit='m')
-    plot.show()
 
 def main(target_time, gap):
     # 抓取時間範圍
@@ -60,8 +55,10 @@ def main(target_time, gap):
         loc_before_mean = loc_before.rolling(window=mean).mean()
         # print(loc_before_mean[15:].values)
         # 計算移動平均的DWT距離
-        distance, path = fastdtw(loc_pre_mean[mean:].values, loc_before_mean[mean:].values, dist=euclidean)
+        distance, path = fastdtw(
+            loc_pre_mean[mean:].values, loc_before_mean[mean:].values, dist=euclidean)
         # print(distance)
+        # print('===============================')
         # 尋找最小的距離並記錄timestamp
         if min_distance == None:
             min_distance = distance
@@ -75,12 +72,13 @@ def main(target_time, gap):
         range_y = target_time - pd.to_timedelta(1 * i, unit='d')
         range_x = range_y - pd.to_timedelta(gap, unit='m')
         range_time = range_x, range_y
-        loc_before = df.loc[range_time[0]:range_time[1]].Global_active_power  #抓資料
+        loc_before = df.loc[range_time[0]:range_time[1]].Global_active_power  # 抓資料
         # 計算移動平均
         loc_before_mean = loc_before.rolling(window=mean).mean()
         # print(loc_before_mean[15:].values)
         # 計算移動平均的DWT距離
-        distance, path = fastdtw(loc_pre_mean[mean:].values, loc_before_mean[mean:].values, dist=euclidean)
+        distance, path = fastdtw(
+            loc_pre_mean[mean:].values, loc_before_mean[mean:].values, dist=euclidean)
         # print(distance)
         if min_distance > distance:
             min_distance = distance
@@ -91,11 +89,18 @@ def main(target_time, gap):
     print(stamp)
     return min_distance, stamp
 
+
 if __name__ == "__main__":
     df = pd.read_csv('D:\Dropbox\paper/dataset/new_record_fake.csv')  # 讀取資料
     df.index = pd.to_datetime(df['Datetime'])  # 轉換index，因為從csv讀取無index
-    init_time = pd.to_datetime(date)  # 轉換時間標籤
+    range_x = pd.to_datetime(date)
+    range_y = range_x+pd.to_timedelta(interval, unit='h')
+    loc = df.loc[range_x:range_y]
+    #生成假資料
+    for  index,i in loc.iterrows():
+        df.loc[index,'Global_active_power'] = uniform(fake_range[0],fake_range[1])
     record = []
+    init_time = pd.to_datetime(date)  # 轉換時間標籤
     for invoke in range (int(interval*60 / run_gap)):
         target_time = init_time + pd.to_timedelta(invoke * run_gap, unit='m') 
         stamp_tmp = []
@@ -115,6 +120,12 @@ if __name__ == "__main__":
             tmp = [target_time, stamp[0][0], distance_tmp, False]
         record.append(tmp)
     print(record)
-        #min_target_time=target_time-pd.to_timedelta(stamp , unit='d')
-        # valid_read(target_time,gap)
-        # valid_read(min_target_time,gap)
+    #畫出當天用電圖
+    loc_pre = df.Global_active_power.loc[date.split()[0]]
+    loc_pre_mean = loc_pre.rolling(window=mean).mean()
+    loc_pre_mean.plot()
+    plot.title('%s fake'%(date))
+    plot.show()
+    #min_target_time=target_time-pd.to_timedelta(stamp , unit='d')
+    # valid_read(target_time,gap)
+    # valid_read(min_target_time,gap)
