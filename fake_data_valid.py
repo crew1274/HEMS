@@ -1,4 +1,5 @@
-import sys
+import time
+tStart = time.time()
 from collections import Counter
 from random import randint, randrange , uniform
 
@@ -12,7 +13,7 @@ date = "2008/10/20 8:00"
 interval = 4 #單位小時，生成假資料的時間長度
 run_gap = 15 #每隔幾分鐘檢查
 fake_range  = 4 , 4.25  #生成假資料的範圍
-mean = 15  # roll mean window size，window size 越長，偵測延遲越長
+mean = 15  # roll mean window size，window size 越長，抗躁能力越好
 weight = 1  #權重
 time_gap = 15 #比對時間長度
 threshold = time_gap * weight #門檻值，比對時間越長，門檻值相對越高
@@ -41,7 +42,6 @@ def main(target_time, gap):
     loc_pre = df.loc[range_x:range_y].Global_active_power  # 撈資料
     loc_pre_mean = loc_pre.rolling(window=mean).mean()  # 計算移動平均
     # print(loc_pre_mean[15:].values)
-    # print('===============================')
     min_distance = None
     stamp = None
     # 星期為單位比較相似度
@@ -58,7 +58,6 @@ def main(target_time, gap):
         distance, path = fastdtw(
             loc_pre_mean[mean:].values, loc_before_mean[mean:].values, dist=euclidean)
         # print(distance)
-        # print('===============================')
         # 尋找最小的距離並記錄timestamp
         if min_distance == None:
             min_distance = distance
@@ -88,7 +87,6 @@ def main(target_time, gap):
     print(min_distance)
     print(stamp)
     return min_distance, stamp
-
 
 if __name__ == "__main__":
     df = pd.read_csv('D:\Dropbox\paper/dataset/new_record_fake.csv')  # 讀取資料
@@ -120,6 +118,8 @@ if __name__ == "__main__":
             tmp = [target_time, stamp[0][0], distance_tmp, False]
         record.append(tmp)
     print(record)
+    tEnd = time.time()
+    print ("程式執行: %f 秒"%(tEnd - tStart))
     #畫出當天用電圖
     loc_pre = df.Global_active_power.loc[date.split()[0]]
     loc_pre_mean = loc_pre.rolling(window=mean).mean()

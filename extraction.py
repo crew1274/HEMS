@@ -1,4 +1,5 @@
-import sys
+import time
+tStart = time.time()
 from collections import Counter
 from random import randint, randrange
 
@@ -11,7 +12,7 @@ from scipy.spatial.distance import euclidean
 date = "2008/10/20 8:00" 
 interval = 3 #單位小時
 run_gap = 15 #每隔幾分鐘檢查
-mean = 15  # roll mean window size，window size 越長，偵測延遲越長
+mean = 15  #roll mean window size，window size 越長，抗躁能力越好
 weight = 1  #權重
 time_gap = 15 #比對時間長度
 threshold = time_gap * weight #門檻值，比對時間越長，門檻值相對越高
@@ -28,11 +29,9 @@ def valid(target_time, gap):
     # 計算移動平均
     loc_pre_mean = loc_pre.rolling(window=mean).mean()
     loc_before_mean = loc_before.rolling(window=mean).mean()
-    distance, path = fastdtw(
-        loc_pre_mean[time_gap:].values, loc_before_mean[mean:].values, dist=euclidean)
+    distance, path = fastdtw(loc_pre_mean[time_gap:].values, loc_before_mean[mean:].values, dist=euclidean)
     print('移動平均後的DWT:%s' % (distance))
     return distance
-
 
 def valid_read(target_time, gap):
     range_y = target_time
@@ -46,7 +45,6 @@ def main(target_time, gap):
     loc_pre = df.loc[range_x:range_y].Global_active_power  # 撈資料
     loc_pre_mean = loc_pre.rolling(window=mean).mean()  # 計算移動平均
     # print(loc_pre_mean[15:].values)
-    # print('===============================')
     min_distance = None
     stamp = None
     # 星期為單位比較相似度
@@ -115,6 +113,8 @@ if __name__ == "__main__":
             tmp = [target_time, stamp[0][0], distance_tmp, False]
         record.append(tmp)
     print(record)
-        #min_target_time=target_time-pd.to_timedelta(stamp , unit='d')
+    tEnd = time.time()
+    print ("程式執行: %f 秒"%(tEnd - tStart))
+        #min_tar:get_time=target_time-pd.to_timedelta(stamp , unit='d')
         # valid_read(target_time,gap)
         # valid_read(min_target_time,gap)
