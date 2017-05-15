@@ -9,9 +9,9 @@ import pandas as pd
 from fastdtw import fastdtw
 from scipy.spatial.distance import euclidean
 
-date = "2008/5/16 9:00" 
+date = "2008/12/28 18:00" 
 interval = 3 #單位小時，生成假資料的時間長度
-fake_range  = 3.75 , 4  #生成假資料的範圍
+fake_range  = 3.5 , 3.75 #生成假資料的範圍
 run_gap = 10 #每隔幾分鐘檢查
 mean = 15  # roll mean window size，window size 越長，抗躁能力越好
 weight = 1  #權重

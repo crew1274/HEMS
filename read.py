@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plot
 import numpy as np
 #選擇時間
-stamp = '2008/5/16'
+stamp = '2008/12/28'
 df=pd.read_csv('D:\Dropbox\paper/dataset/dataset.csv') #讀取資料
 df.index = pd.to_datetime(df['Datetime']) #轉換index，因為從csv讀取無index
 loc_pre=df.Global_active_power.loc[stamp]
