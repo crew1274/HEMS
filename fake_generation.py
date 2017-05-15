@@ -8,7 +8,7 @@ date = "2008/10/20 20:00"
 gap = 3 #3小時
 mean = 15
 range  = 0.75 , 1
-df = pd.read_csv('D:\Dropbox\paper/dataset/new_record_fake.csv') #讀取資料
+df = pd.read_csv('D:\Dropbox\paper/dataset/dataset.csv') #讀取資料
 df.index = pd.to_datetime(df['Datetime']) #轉換index，因為從csv讀取無index
 #轉換時間標籤
 range_x = pd.to_datetime(date)

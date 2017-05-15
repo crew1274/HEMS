@@ -9,10 +9,10 @@ import pandas as pd
 from fastdtw import fastdtw
 from scipy.spatial.distance import euclidean
 
-date = "2008/10/20 8:00" 
-interval = 4 #單位小時，生成假資料的時間長度
-run_gap = 15 #每隔幾分鐘檢查
-fake_range  = 4 , 4.25  #生成假資料的範圍
+date = "2008/5/16 9:00" 
+interval = 3 #單位小時，生成假資料的時間長度
+fake_range  = 3.75 , 4  #生成假資料的範圍
+run_gap = 10 #每隔幾分鐘檢查
 mean = 15  # roll mean window size，window size 越長，抗躁能力越好
 weight = 1  #權重
 time_gap = 15 #比對時間長度
@@ -89,7 +89,7 @@ def main(target_time, gap):
     return min_distance, stamp
 
 if __name__ == "__main__":
-    df = pd.read_csv('D:\Dropbox\paper/dataset/new_record_fake.csv')  # 讀取資料
+    df = pd.read_csv('D:\Dropbox\paper/dataset/dataset.csv')  # 讀取資料
     df.index = pd.to_datetime(df['Datetime'])  # 轉換index，因為從csv讀取無index
     range_x = pd.to_datetime(date)
     range_y = range_x+pd.to_timedelta(interval, unit='h')
@@ -98,6 +98,7 @@ if __name__ == "__main__":
     for  index,i in loc.iterrows():
         df.loc[index,'Global_active_power'] = uniform(fake_range[0],fake_range[1])
     record = []
+    counter = 0
     init_time = pd.to_datetime(date)  # 轉換時間標籤
     for invoke in range (int(interval*60 / run_gap)):
         target_time = init_time + pd.to_timedelta(invoke * run_gap, unit='m') 
@@ -114,10 +115,12 @@ if __name__ == "__main__":
         distance_tmp = valid(target_time, stamp[0][0])
         if(distance_tmp > threshold):
             tmp = [target_time, stamp[0][0], distance_tmp, True]
+            counter = counter+1
         else:
             tmp = [target_time, stamp[0][0], distance_tmp, False]
         record.append(tmp)
     print(record)
+    print("異常用電時警報發生:%s次"%(counter))
     tEnd = time.time()
     print ("程式執行: %f 秒"%(tEnd - tStart))
     #畫出當天用電圖
