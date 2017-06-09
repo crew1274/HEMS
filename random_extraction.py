@@ -11,9 +11,9 @@ from scipy.spatial.distance import euclidean
 mean = 15 #roll mean window size
 #window size 越長，偵測延遲越長
 
-weight = 1
+weight = 0.5
 time_gap = 15 #比對時間長度
-threshold = time_gap * weight #門檻值
+#threshold = time_gap * weight #門檻值
 #比對時間越長，門檻值相對越高
 
 def valid(target_time,gap):
@@ -97,7 +97,7 @@ def main( target_time , gap ):
     return min_distance , stamp
 
 if __name__ == "__main__":
-    df=pd.read_csv('D:\Dropbox\paper/dataset/new_record.csv')#讀取資料
+    df=pd.read_csv('D:\Dropbox\paper/dataset/dataset.csv')#讀取資料
     df.index = pd.to_datetime(df['Datetime']) #轉換index，因為從csv讀取無index
     '''
     #輸入時間
@@ -110,7 +110,7 @@ if __name__ == "__main__":
     count = 0
     #隨機時間
     for i in range(0,5,1):
-        target_time=pd.to_datetime('%s/%s/%s %s:%s'%(randint(2007,2009),randint(1,12),randint(1,28),randint(0,23),randrange(0,59,15)))
+        target_time=pd.to_datetime('%s/%s/%s %s:%s'%(randint(2007,2009),randint(1,12),randint(1,28),randint(0,23),randrange(0,59,10)))
         stamp_tmp = []
         dist_tmp = []
         for gap in range(30,105,15):
@@ -130,7 +130,7 @@ if __name__ == "__main__":
                     threshold = dist_tmp[k]
         print('預估相似值為:%s'%(threshold))
         distance_tmp = valid(target_time,stamp[0][0])
-        if(distance_tmp > threshold ):
+        if(distance_tmp > time_gap * weight ):
             tmp=[target_time,stamp[0][0],distance_tmp,True]
             count= count +1
         else:
@@ -139,7 +139,7 @@ if __name__ == "__main__":
     record = pd.DataFrame(record,columns=['datetimes','stamp','distance','alert'])
     print(record)
     print('錯誤警報:%s次'%(count))
-    record.to_csv('record.csv',mode='a',header=False)    
+    record.to_csv('0.5/fpr.csv',mode='a',header=False)    
     #min_target_time=target_time-pd.to_timedelta(stamp , unit='d')
     #valid_read(target_time,gap)
     #valid_read(min_target_time,gap)

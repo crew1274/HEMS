@@ -9,12 +9,12 @@ import pandas as pd
 from fastdtw import fastdtw
 from scipy.spatial.distance import euclidean
 
-date = "2008/12/28 18:00" 
+date = "2008/12/28 18:00 " 
 interval = 3 #單位小時，生成假資料的時間長度
 fake_range  = 3.5 , 3.75 #生成假資料的範圍
-run_gap = 10 #每隔幾分鐘檢查
+run_gap = 15 #每隔幾分鐘檢查
 mean = 15  # roll mean window size，window size 越長，抗躁能力越好
-weight = 1  #權重
+weight = 1 #權重
 time_gap = 15 #比對時間長度
 threshold = time_gap * weight #門檻值，比對時間越長，門檻值相對越高
 
@@ -118,11 +118,15 @@ if __name__ == "__main__":
             counter = counter+1
         else:
             tmp = [target_time, stamp[0][0], distance_tmp, False]
-        record.append(tmp)
+        record.append(distance_tmp)
     print(record)
+    record = pd.DataFrame(record,columns=['distance'])
+    record.to_csv('tpr.csv',mode='a',header=False)   
+    print("總共偵測:%s次"%(int(interval*60 / run_gap)))
     print("異常用電時警報發生:%s次"%(counter))
     tEnd = time.time()
     print ("程式執行: %f 秒"%(tEnd - tStart))
+    '''
     #畫出當天用電圖
     loc_pre = df.Global_active_power.loc[date.split()[0]]
     loc_pre_mean = loc_pre.rolling(window=mean).mean()
@@ -132,3 +136,4 @@ if __name__ == "__main__":
     #min_target_time=target_time-pd.to_timedelta(stamp , unit='d')
     # valid_read(target_time,gap)
     # valid_read(min_target_time,gap)
+    '''

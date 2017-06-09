@@ -10,7 +10,7 @@ from scipy.spatial.distance import euclidean
 
 date = "2008/12/28 18:00" 
 interval = 3 #單位小時
-run_gap = 10 #每隔幾分鐘檢查
+run_gap = 15 #每隔幾分鐘檢查
 mean = 15  #roll mean window size，window size 越長，抗躁能力越好
 weight = 1  #權重
 time_gap = 15 #比對時間長度
