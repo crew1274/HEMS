@@ -11,7 +11,7 @@ from scipy.spatial.distance import euclidean
 mean = 15 #roll mean window size
 #window size 越長，偵測延遲越長
 
-weight = 0.5
+weight = 0.9
 time_gap = 15 #比對時間長度
 #threshold = time_gap * weight #門檻值
 #比對時間越長，門檻值相對越高
@@ -139,7 +139,7 @@ if __name__ == "__main__":
     record = pd.DataFrame(record,columns=['datetimes','stamp','distance','alert'])
     print(record)
     print('錯誤警報:%s次'%(count))
-    record.to_csv('0.5/fpr.csv',mode='a',header=False)    
+    record.to_csv('0.9/fpr.csv',mode='a',header=False)    
     #min_target_time=target_time-pd.to_timedelta(stamp , unit='d')
     #valid_read(target_time,gap)
     #valid_read(min_target_time,gap)
